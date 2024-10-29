@@ -76,6 +76,16 @@ function App() {
     setOutput([...output, `> ${command}`, response])
   }
 
+  const handleInput = (event) => {
+    if (event.key === 'Enter') {
+      if (gameOver) {
+        setOutput([...output, 'Terminal Locked. Game Over.'])
+        setInput('')
+        return
+      }
+    }
+  }
+
 
 
   return (
