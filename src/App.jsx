@@ -83,7 +83,17 @@ function App() {
         setInput('')
         return
       }
+
+      if (gameActive) {
+        checkPassword(input)
+      } else {
+        processCommand(input)
+      }
+      setInput('')
+      }
     }
+
+    
   }
 
 
