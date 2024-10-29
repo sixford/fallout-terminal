@@ -63,6 +63,21 @@ function App() {
     return randomWords
   }
 
+  const processCommand = (command) => {
+    let response = 'Unknown command'
+    if (command === 'help') {
+      response = 'Available commands: help, about, hack'
+    } else if (command === 'about') {
+      response = 'RobCo Industries (TM) Terminal'
+    } else if (command === 'hack') {
+      startGame()
+      response = 'Password Hack Initiated. Type your guess.'
+    }
+    setOutput([...output, `> ${command}`, response])
+  }
+
+
+
   return (
     <div className="terminal">
       <h1>Debugging Panel</h1>
