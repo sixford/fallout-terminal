@@ -12,3 +12,21 @@ function App() {
   const [lives, setLives] = useState(3)  // Number of lives
   const [hint, setHint] = useState('')  // Hint for the game
   const [gameOver, setGameOver] = useState(false)// Tracks if the game is over
+
+  const gameStart = () => {
+    setGameStarted(true)
+    setOutput(['Welcome to RobCo Industries TermLink'])
+  }
+
+  const startGame = () => {
+    setGameActive(true)
+    setLives(3)
+    setGameOver(false)
+    const randomWords = generateRandomWords()
+    const Password = randomWords[Math.floor(Math.random() * randomWords.length)]
+    setOptions(randomWords)
+    setPassword(chosenPassword)
+    setHint(`Hint: The password has ${chosenPassword.length} letters.`)
+    setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
+  }
+
