@@ -12,6 +12,7 @@ function App() {
   const [lives, setLives] = useState(3)  // Number of lives
   const [hint, setHint] = useState('')  // Hint for the game
   const [gameOver, setGameOver] = useState(false)// Tracks if the game is over
+  const [wordGrid, setWordGrid] = useState([])
 
   // Game start function 
   const gameStart = () => {
@@ -48,6 +49,61 @@ function App() {
   }))
   setWordGrid(grid)
 
-const genRandomWords = () => {
+const getRandomWords = () => {
   const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRIPE', 'POLITE', 'HOUSES', 'GRANITE', 'RANDOM', '']
+  let randomWords = []
+  for (let i = 0; i < 6; i++) {
+    const word = words[Math.floor(Math.random() * words.length)]
+    randomWords.push(word)
+  }
+  console.log('Generated random words:', randomWords)
+  return randomWords
 }
+
+return (
+  <div className="terminal">
+    {/* Debugging and Testing Buttons */}
+    <h1>Debugging Panel</h1>
+    <button onClick={gameStart}>Start Game</button>
+    <button onClick={startGame}>Start Password Game</button>
+    <div>
+      Lives: {lives}
+    </div>
+
+    {!gameStarted ? (
+      <OpeningScreen onStart={gameStart} /> // Display opening screen if game not started
+    ) : (
+      <>
+        {output.map((line, index) => (
+          <div key={index} className="output">{line}</div>
+        ))}
+        {gameActive && (
+          <div className="word-grid">
+            {wordGrid.map((item, index) => (
+              <span 
+                key={index}
+                className="word-item"
+                style={{ position: 'absolute', left: item.x, top: item.y }}
+              >
+                {item.word}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="lives">Lives: {lives}</div>
+        <input
+          type="text"
+          className="input"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter command or password"
+          disabled={gameOver}
+        />
+      </>
+    )}
+  </div>
+)
+}
+
+export default App
+
