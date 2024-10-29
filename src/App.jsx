@@ -47,3 +47,7 @@ function App() {
     y: Math.floor(index / 2) * 24
   }))
   setWordGrid(grid)
+
+const genRandomWords = () => {
+  const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRIPE', 'POLITE', 'HOUSES', 'GRANITE', 'RANDOM', '']
+}
