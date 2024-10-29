@@ -13,9 +13,12 @@ function App() {
   const [hint, setHint] = useState('')  // Hint for the game
   const [gameOver, setGameOver] = useState(false)// Tracks if the game is over
 
+  // Game start function 
   const gameStart = () => {
     setGameStarted(true)
     setOutput(['Welcome to RobCo Industries TermLink'])
+    console.log('Game started;', gameStart)
+    console.log('Output:', output)
   }
 
   const startGame = () => {
@@ -28,5 +31,19 @@ function App() {
     setPassword(chosenPassword)
     setHint(`Hint: The password has ${chosenPassword.length} letters.`)
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
+
+
+    console.log('Password game started:', gameActive)
+    console.log('Lives set to:', lives)
+    console.log('Random words:', randomWords)
+    console.log('Chosen password:', chosenPassword)
+    console.log('Hint:', hint)
   }
 
+  // Grid generation
+  const grid = randomWords.map((word, index) => ({
+    word,
+    x: Math.floor(Math.random() * 10) * 60,
+    y: Math.floor(index / 2) * 24
+  }))
+  setWordGrid(grid)
