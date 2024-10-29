@@ -112,6 +112,14 @@ function App() {
       }
     }
 
+    const calculateMatchingLetters = (guess, password) => {
+      let matchCount = 0
+      for (let i = 0; i < guess.length; i++) {
+        if (guess[i] === password[i]) matchCount++
+      }
+      return matchCount
+    }
+
   }
 
 
