@@ -92,8 +92,26 @@ function App() {
       setInput('')
       }
     }
-
     
+    const checkPassword = (guess) => {
+      if (guess === password) {
+        setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
+        setGameActive(false)
+      } else {
+        const matches = calculateMatchingLetters(guess, password)
+        const newHint = `Hint: ${matches} letters match the correct password position.`
+        setHint(newHint)
+        setLives((prev) => prev - 1)
+
+        if (lives - 1 <= 0) {
+          setGameOver(true)
+          setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
+        } else {
+          setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
+        }
+      }
+    }
+
   }
 
 
