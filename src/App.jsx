@@ -5,12 +5,12 @@ import OpeningScreen from './OpeningScreen.jsx'
 function App() {
   const [gameStarted, setGameStarted] = useState(false) // Tracks if the game has started
   const [input, setInput] = useState('') // Stores user input
-  const [output, setOutput] = useState(['Welcome to RobCo Industries (TM) Termlink']);
+  const [output, setOutput] = useState(['Welcome to RobCo Industries Termlink'])
   const [gameActive, setGameActive] = useState(false) // Tracks if the password game is active
   const [options, setOptions] = useState([]) // Password options for the game
   const [password, setPassword] = useState('') // Correct password
   const [lives, setLives] = useState(3) // Number of lives
-  const [hint, setHint] = useState('')  // Hint for the game
+  const [hint, setHint] = useState('') // Hint for the game
   const [gameOver, setGameOver] = useState(false)// Tracks if the game is over
   const [wordGrid, setWordGrid] = useState([])// New state for grid of words
 
@@ -76,6 +76,7 @@ function App() {
     setOutput([...output, `> ${command}`, response])
   }
 
+  // Handle user input for both commands and password guesses
   const handleInput = (event) => {
     if (event.key === 'Enter') {
       if (gameOver) {
@@ -90,49 +91,40 @@ function App() {
         processCommand(input)
       }
       setInput('')
-      }
     }
-    
-    const checkPassword = (guess) => {
-      if (guess === password) {
-        setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
-        setGameActive(false)
-      } else {
-        const matches = calculateMatchingLetters(guess, password)
-        const newHint = `Hint: ${matches} letters match the correct password position.`
-        setHint(newHint)
-        setLives((prev) => prev - 1)
-
-        if (lives - 1 <= 0) {
-          setGameOver(true)
-          setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
-        } else {
-          setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
-        }
-      }
-    }
-
-    const calculateMatchingLetters = (guess, password) => {
-      let matchCount = 0
-      for (let i = 0; i < guess.length; i++) {
-        if (guess[i] === password[i]) matchCount++
-      }
-      return matchCount
-    }
-
   }
 
+  const checkPassword = (guess) => {
+    if (guess === password) {
+      setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
+      setGameActive(false)
+    } else {
+      const matches = calculateMatchingLetters(guess, password);
+      const newHint = `Hint: ${matches} letters match the correct password position.`
+      setHint(newHint);
+      setLives((prev) => prev - 1)
 
+      if (lives - 1 <= 0) {
+        setGameOver(true);
+        setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
+      } else {
+        setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
+      }
+    }
+  }
 
+  // Calculate guess and password
+  const calculateMatchingLetters = (guess, password) => {
+    let matchCount = 0
+    for (let i = 0; i < guess.length; i++) {
+      if (guess[i] === password[i]) matchCount++
+    }
+    return matchCount
+  }
+
+  // Main UI layout
   return (
     <div className="terminal">
-      <h1>Debugging Panel</h1>
-      <button onClick={gameStart}>Start Game</button>
-      <button onClick={startGame}>Start Password Game</button>
-      <div>
-        Lives: {lives}
-      </div>
-
       {!gameStarted ? (
         <OpeningScreen onStart={gameStart} /> // Display opening screen if game not started
       ) : (
@@ -154,11 +146,13 @@ function App() {
             </div>
           )}
           <div className="lives">Lives: {lives}</div>
+          <div className="hint">{hint}</div>
           <input
             type="text"
             className="input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleInput}
             placeholder="Enter command or password"
             disabled={gameOver}
           />
@@ -169,5 +163,6 @@ function App() {
 }
 
 export default App
+
 
 
