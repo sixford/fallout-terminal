@@ -24,6 +24,7 @@ function App() {
 
   // Password game setup function
   const startGame = () => {
+    console.log("Setting up the password game...")
     setGameActive(true)
     setLives(3)
     setGameOver(false)
@@ -76,21 +77,23 @@ function App() {
     setOutput([...output, `> ${command}`, response])
   }
 
-  // Handle user input for both commands and password guesses
   const handleInput = (event) => {
     if (event.key === 'Enter') {
+      console.log("Input received:", input)
       if (gameOver) {
         setOutput([...output, 'Terminal Locked. Game Over.'])
         setInput('')
         return
       }
-
+  
       if (gameActive) {
-        checkPassword(input)
+        console.log("Game is active. Checking password...")
+        checkPassword(input) // Handle as password guess if game is active
       } else {
-        processCommand(input)
+        console.log("Processing command:", input)
+        processCommand(input) // Handle as command otherwise
       }
-      setInput('')
+      setInput('') // Clear input field after each entry
     }
   }
 
@@ -99,13 +102,13 @@ function App() {
       setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
       setGameActive(false)
     } else {
-      const matches = calculateMatchingLetters(guess, password);
+      const matches = calculateMatchingLetters(guess, password)
       const newHint = `Hint: ${matches} letters match the correct password position.`
-      setHint(newHint);
+      setHint(newHint)
       setLives((prev) => prev - 1)
 
       if (lives - 1 <= 0) {
-        setGameOver(true);
+        setGameOver(true)
         setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
       } else {
         setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
@@ -163,6 +166,7 @@ function App() {
 }
 
 export default App
+
 
 
 
