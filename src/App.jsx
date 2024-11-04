@@ -81,13 +81,13 @@ function App() {
     if (event.key === 'Enter') {
       console.log("Input received:", input)
       if (gameOver) {
-        setOutput([...output, 'Terminal Locked. Game Over.'])
+        setOutput([...output, 'Terminal Locked.'])
         setInput('')
         return
       }
   
       if (gameActive) {
-        console.log("Game is active. Checking password...")
+        console.log("Checking password...")
         checkPassword(input) // Handle as password guess if game is active
       } else {
         console.log("Processing command:", input)
