@@ -32,7 +32,7 @@ function App() {
     setHint(`Hint: The password has ${chosenPassword.length} letters.`)
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
 
-    generateWordGrid(randomWords); // Create grid
+    generateWordGrid(randomWords) // Create grid
   }
 
   // Generates random words
@@ -90,10 +90,11 @@ function App() {
     } else if (command === 'about') {
       response = 'RobCo Industries (TM) Terminal'
     } else if (command === 'hack') {
-      startGame();
+      startGame()
       response = 'Password Hack Initiated. Type your guess.'
     }
     setOutput([...output, `> ${command}`, response])
+  } // Close processCommand function
 
   const handleInput = (event) => {
     if (event.key === 'Enter') {
@@ -111,14 +112,13 @@ function App() {
       setInput('')
     }
   }
-}
 
   const checkPassword = (guess) => {
     if (guess === password) {
       setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
       setGameActive(false)
     } else {
-      const matches = calculateMatchingLetters(guess, password)
+      const matches = calculateMatchingLetters(guess, password);
       const newHint = `Hint: ${matches} letters match the correct password position.`
       setHint(newHint)
       setLives((prev) => prev - 1)
@@ -133,14 +133,14 @@ function App() {
   }
 
   const calculateMatchingLetters = (guess, password) => {
-    let matchCount = 0;
+    let matchCount = 0
     for (let i = 0; i < guess.length; i++) {
       if (guess[i] === password[i]) matchCount++
     }
     return matchCount
   }
 
-  // Render word grid
+  // Render the word grid
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
@@ -180,5 +180,5 @@ function App() {
   )
 }
 
-
 export default App
+
