@@ -3,28 +3,25 @@ import './App.css'
 import OpeningScreen from './OpeningScreen.jsx'
 
 function App() {
-  const [gameStarted, setGameStarted] = useState(false) // Tracks if the game has started
-  const [input, setInput] = useState('') // Stores user input
+  const [gameStarted, setGameStarted] = useState(false)
+  const [input, setInput] = useState('')
   const [output, setOutput] = useState(['Welcome to RobCo Industries Termlink'])
-  const [gameActive, setGameActive] = useState(false) // Tracks if the password game is active
-  const [options, setOptions] = useState([]) // Password options for the game
-  const [password, setPassword] = useState('') // Correct password
-  const [lives, setLives] = useState(3) // Number of lives
-  const [hint, setHint] = useState('') // Hint for the game
-  const [gameOver, setGameOver] = useState(false)// Tracks if the game is over
-  const [wordGrid, setWordGrid] = useState([])// New state for grid of words
+  const [gameActive, setGameActive] = useState(false)
+  const [options, setOptions] = useState([])
+  const [password, setPassword] = useState('')
+  const [lives, setLives] = useState(3)
+  const [hint, setHint] = useState('')
+  const [gameOver, setGameOver] = useState(false)
+  const [wordGrid, setWordGrid] = useState([])
 
   // Game start function 
   const gameStart = () => {
     setGameStarted(true)
     setOutput(['Welcome to RobCo Industries TermLink'])
-    console.log('Game started:', gameStarted)
-    console.log('Output:', output)
   }
 
   // Password game setup function
   const startGame = () => {
-    console.log("Setting up the password game...")
     setGameActive(true)
     setLives(3)
     setGameOver(false)
@@ -35,24 +32,10 @@ function App() {
     setHint(`Hint: The password has ${chosenPassword.length} letters.`)
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
 
-    console.log('Password game started:', gameActive)
-    console.log('Lives set to:', lives)
-    console.log('Random words:', randomWords)
-    console.log('Chosen password:', chosenPassword)
-    console.log('Hint:', hint)
-
-    // Grid generation for random words
-    const grid = randomWords.map((word, index) => ({
-      word,
-      x: Math.floor(Math.random() * 10) * 60,  // grid size and spacing
-      y: Math.floor(index / 2) * 24
-    }))
-    setWordGrid(grid)
-
-    console.log('Generated word grid:', grid)
+    generateWordGrid(randomWords); // Create grid
   }
 
-  // Generates random words for password game
+  // Generates random words
   const generateRandomWords = () => {
     const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRIPE', 'POLITE', 'HOUSES', 'GRANITE', 'RANDOM']
     let randomWords = []
@@ -60,8 +43,44 @@ function App() {
       const word = words[Math.floor(Math.random() * words.length)]
       randomWords.push(word)
     }
-    console.log('Generated random words:', randomWords)
     return randomWords
+  }
+
+  // Generate a random filler character
+  const getRandomCharacter = () => {
+    const characters = ['*', '@', '#', '$', '%', '&', '!', '^', '?']
+    return characters[Math.floor(Math.random() * characters.length)]
+  }
+
+  // Generate word grid with filler characters and words
+  const generateWordGrid = (randomWords) => {
+    const gridSize = 20 // 20 rows of grid
+    const grid = []
+
+    for (let row = 0; row < gridSize; row++) {
+      const rowArray = []
+      for (let col = 0; col < 20; col++) {
+        rowArray.push(getRandomCharacter())
+      }
+      grid.push(rowArray)
+    }
+
+    // Randomly place words in the grid
+    randomWords.forEach((word) => {
+      let placed = false
+      while (!placed) {
+        const row = Math.floor(Math.random() * gridSize)
+        const col = Math.floor(Math.random() * (20 - word.length))
+        if (grid[row].slice(col, col + word.length).every((cell) => !randomWords.includes(cell))) {
+          for (let i = 0; i < word.length; i++) {
+            grid[row][col + i] = word[i]
+          }
+          placed = true
+        }
+      }
+    })
+
+    setWordGrid(grid)
   }
 
   const processCommand = (command) => {
@@ -71,31 +90,28 @@ function App() {
     } else if (command === 'about') {
       response = 'RobCo Industries (TM) Terminal'
     } else if (command === 'hack') {
-      startGame()
+      startGame();
       response = 'Password Hack Initiated. Type your guess.'
     }
     setOutput([...output, `> ${command}`, response])
-  }
 
   const handleInput = (event) => {
     if (event.key === 'Enter') {
-      console.log("Input received:", input)
       if (gameOver) {
-        setOutput([...output, 'Terminal Locked.'])
+        setOutput([...output, 'Terminal Locked. Game Over.'])
         setInput('')
         return
       }
-  
+
       if (gameActive) {
-        console.log("Checking password...")
-        checkPassword(input) // Handle as password guess if game is active
+        checkPassword(input)
       } else {
-        console.log("Processing command:", input)
-        processCommand(input) // Handle as command otherwise
+        processCommand(input)
       }
-      setInput('') // Clear input field after each entry
+      setInput('')
     }
   }
+}
 
   const checkPassword = (guess) => {
     if (guess === password) {
@@ -108,7 +124,7 @@ function App() {
       setLives((prev) => prev - 1)
 
       if (lives - 1 <= 0) {
-        setGameOver(true)
+        setGameOver(true);
         setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
       } else {
         setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
@@ -116,37 +132,36 @@ function App() {
     }
   }
 
-  // Calculate guess and password
   const calculateMatchingLetters = (guess, password) => {
-    let matchCount = 0
+    let matchCount = 0;
     for (let i = 0; i < guess.length; i++) {
       if (guess[i] === password[i]) matchCount++
     }
     return matchCount
   }
 
-  // Main UI layout
+  // Render word grid
+  const renderWordGrid = () => {
+    return wordGrid.map((row, rowIndex) => (
+      <div key={rowIndex} className="grid-row">
+        {row.map((cell, colIndex) => (
+          <span key={colIndex} className="grid-cell">{cell}</span>
+        ))}
+      </div>
+    ))
+  }
+
   return (
     <div className="terminal">
       {!gameStarted ? (
-        <OpeningScreen onStart={gameStart} /> // Display opening screen if game not started
+        <OpeningScreen onStart={gameStart} />
       ) : (
         <>
           {output.map((line, index) => (
             <div key={index} className="output">{line}</div>
           ))}
           {gameActive && (
-            <div className="word-grid">
-              {wordGrid.map((item, index) => (
-                <span 
-                  key={index}
-                  className="word-item"
-                  style={{ position: 'absolute', left: item.x, top: item.y }}
-                >
-                  {item.word}
-                </span>
-              ))}
-            </div>
+            <div className="word-grid">{renderWordGrid()}</div>
           )}
           <div className="lives">Lives: {lives}</div>
           <div className="hint">{hint}</div>
@@ -165,8 +180,5 @@ function App() {
   )
 }
 
+
 export default App
-
-
-
-
