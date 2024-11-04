@@ -18,6 +18,7 @@ function App() {
   const gameStart = () => {
     setGameStarted(true)
     setOutput(['Welcome to RobCo Industries TermLink'])
+    startGame()
   }
 
   // Password game setup function
