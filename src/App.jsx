@@ -33,7 +33,7 @@ function App() {
     setHint(`Hint: The password has ${chosenPassword.length} letters.`)
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
 
-    generateWordGrid(randomWords); // Create grid
+    generateWordGrid(randomWords) // Create grid
   }
 
   // Generates random words
@@ -54,9 +54,11 @@ function App() {
   }
 
   // Generate word grid with filler characters and words
+
   const generateWordGrid = (randomWords) => {
-    const gridSize = 20 // 20 rows of grid
+    const gridSize = 20
     const grid = []
+    const positions = {}
 
     for (let row = 0; row < gridSize; row++) {
       const rowArray = []
@@ -78,13 +80,14 @@ function App() {
             grid[row][col + i] = word[i]
             positions[`${row}-${col + i}`] = word // Track position
           }
-          placed = true;
+          placed = true
         }
       }
     })
 
     setWordGrid(grid)
     setWordPositions(positions)
+    console.log('Generated Word Grid:', grid)
   }
 
   // Handle clicking on a word to make a guess
