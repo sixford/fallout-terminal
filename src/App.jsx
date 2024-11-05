@@ -32,7 +32,7 @@ function App() {
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
 
     generateWordGrid(randomWords)
-  }
+  } 
 
   const generateRandomWords = () => {
     const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRITTY', 'POLITE', 'HOUSES', 'GRANDE', 'RANDOM']
