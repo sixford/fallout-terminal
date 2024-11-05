@@ -12,6 +12,7 @@ function App() {
   const [hint, setHint] = useState('')
   const [gameOver, setGameOver] = useState(false)
   const [wordGrid, setWordGrid] = useState([])
+  const [wordPositions, setWordPositions] = useState({})
 
   // Game start function that also loads the game immediately
   const gameStart = () => {
@@ -66,21 +67,24 @@ function App() {
     }
 
     // Randomly place words in the grid
+
     randomWords.forEach((word) => {
       let placed = false
       while (!placed) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * (20 - word.length))
-        if (grid[row].slice(col, col + word.length).every((cell) => cell !== word)) {
+        if (grid[row].slice(col, col + word.length).every((cell) => !positions[`${row}-${col}`])) {
           for (let i = 0; i < word.length; i++) {
             grid[row][col + i] = word[i]
+            positions[`${row}-${col + i}`] = word // Track position
           }
-          placed = true
+          placed = true;
         }
       }
     })
 
     setWordGrid(grid)
+    setWordPositions(positions)
   }
 
   // Handle clicking on a word to make a guess
