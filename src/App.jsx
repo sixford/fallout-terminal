@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import './App.css'
 import OpeningScreen from './OpeningScreen.jsx'
 
+const gridSize = 25  // Define gridSize at the top level so it's accessible throughout
+
 function App() {
   const [gameStarted, setGameStarted] = useState(false)
   const [output, setOutput] = useState(['Welcome to RobCo Industries Termlink'])
@@ -14,7 +16,7 @@ function App() {
   const [wordGrid, setWordGrid] = useState([])
   const [wordPositions, setWordPositions] = useState({})
 
-  const dudCharacters = ['(', '?', ']', '>', ';', ')'] // Dud character remove words
+  const dudCharacters = ['(', '?', ']', '>', ';', ')']
 
   const gameStart = () => {
     setGameStarted(true)
@@ -56,16 +58,13 @@ function App() {
   }
 
   const generateWordGrid = (randomWords) => {
-    const gridSize = 25
     const grid = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => getRandomCharacter())
     )
-  
+
     const positions = {}
-  
-    // Define the exact dud remover sequence
     const dudRemoverSequence = '(?]>;)'
-  
+
     const placeSequenceWithWrapping = (sequence, row, col) => {
       for (let i = 0; i < sequence.length; i++) {
         const wrapRow = row % gridSize
@@ -73,28 +72,27 @@ function App() {
         grid[wrapRow][wrapCol] = sequence[i]
       }
     }
-  
-    // Place each word in a random location with wrapping
+
     randomWords.forEach((word) => {
       let placed = false
       let attemptCounter = 0
-  
+
       while (!placed && attemptCounter < 50) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * gridSize)
-  
+
         let canPlace = true
         for (let i = 0; i < word.length; i++) {
-          const wrapRow = (row) % gridSize
+          const wrapRow = row % gridSize
           const wrapCol = (col + i) % gridSize
           const cell = grid[wrapRow][wrapCol]
-  
+
           if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
             canPlace = false
             break
           }
         }
-  
+
         if (canPlace) {
           positions[word] = { row, col }
           placeSequenceWithWrapping(word, row, col)
@@ -103,28 +101,27 @@ function App() {
         attemptCounter++
       }
     })
-  
-    // Place the exact dud remover sequence `(?>;)` randomly on the grid a few times
-    for (let i = 0; i < 3; i++) {  // Place it three times for availability
+
+    for (let i = 0; i < 3; i++) {  // Place dud remover sequence three times
       let placed = false
       let attemptCounter = 0
-  
+
       while (!placed && attemptCounter < 50) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * gridSize)
-  
+
         let canPlace = true
         for (let j = 0; j < dudRemoverSequence.length; j++) {
           const wrapRow = row % gridSize
           const wrapCol = (col + j) % gridSize
           const cell = grid[wrapRow][wrapCol]
-  
+
           if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
             canPlace = false
             break
           }
         }
-  
+
         if (canPlace) {
           placeSequenceWithWrapping(dudRemoverSequence, row, col)
           placed = true
@@ -132,39 +129,14 @@ function App() {
         attemptCounter++
       }
     }
-  
+
     setWordGrid(grid)
     setWordPositions(positions)
   }
-  
+
   const handleWordClick = (word) => {
     if (!gameOver && gameActive) {
       checkPassword(word)
-    }
-  }
-
-  const handleDudRemoval = () => {
-    const incorrectWords = options.filter(word => word !== password && wordPositions[word])
-
-    if (incorrectWords.length > 0) {
-      const randomDud = incorrectWords[Math.floor(Math.random() * incorrectWords.length)]
-      const { row, col } = wordPositions[randomDud]
-      const updatedGrid = [...wordGrid]
-      for (let i = 0; i < randomDud.length; i++) {
-        updatedGrid[row][col + i] = getRandomCharacter()
-      }
-
-      setWordGrid(updatedGrid)
-      const updatedOptions = options.filter(word => word !== randomDud)
-      setOptions(updatedOptions)
-
-      const updatedPositions = { ...wordPositions }
-      delete updatedPositions[randomDud]
-      setWordPositions(updatedPositions)
-
-      setOutput([...output, `> Dud removed: ${randomDud}`])
-    } else {
-      setOutput([...output, '> No more duds to remove!'])
     }
   }
 
@@ -195,13 +167,56 @@ function App() {
     return matchCount
   }
 
+  const handleWordHover = (word, isHovered) => {
+    const { row, col } = wordPositions[word]
+    const updatedGrid = [...wordGrid]
+
+    for (let i = 0; i < word.length; i++) {
+      const wrapRow = row % gridSize
+      const wrapCol = (col + i) % gridSize
+      updatedGrid[wrapRow][wrapCol] = isHovered ? word[i].toUpperCase() : word[i]
+    }
+
+    setWordGrid(updatedGrid)
+  }
+
+  const handleDudRemoval = () => {
+    const incorrectWords = options.filter(word => word !== password && wordPositions[word])
+
+    if (incorrectWords.length > 0) {
+      const randomDud = incorrectWords[Math.floor(Math.random() * incorrectWords.length)]
+      
+      const { row, col } = wordPositions[randomDud]
+      const updatedGrid = [...wordGrid]
+      
+      for (let i = 0; i < randomDud.length; i++) {
+        const wrapRow = (row + i) % gridSize
+        const wrapCol = (col + i) % gridSize
+        updatedGrid[wrapRow][wrapCol] = getRandomCharacter()
+      }
+
+      setWordGrid(updatedGrid)
+      setOptions(options.filter(word => word !== randomDud))
+
+      const updatedPositions = { ...wordPositions }
+      delete updatedPositions[randomDud]
+      setWordPositions(updatedPositions)
+
+      setOutput([...output, `> Dud removed: ${randomDud}`])
+    } else {
+      setOutput([...output, '> No more duds to remove!'])
+    }
+  }
+
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
         {row.map((cell, colIndex) => {
           const wordAtPosition = Object.keys(wordPositions).find((word) => {
             const { row, col } = wordPositions[word]
-            return row === rowIndex && col <= colIndex && colIndex < col + word.length
+            return (
+              row === rowIndex && col <= colIndex && colIndex < col + word.length
+            )
           })
 
           if (wordAtPosition) {
@@ -236,17 +251,6 @@ function App() {
         })}
       </div>
     ))
-  }
-
-  const handleWordHover = (word, isHovered) => {
-    const { row, col } = wordPositions[word]
-    const updatedGrid = [...wordGrid]
-
-    for (let i = 0; i < word.length; i++) {
-      updatedGrid[row][col + i] = isHovered ? word[i].toUpperCase() : word[i]
-    }
-
-    setWordGrid(updatedGrid)
   }
 
   return (
