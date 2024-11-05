@@ -34,12 +34,21 @@
   gap: 3px;
 }
 
-/* Each cell in the grid */
 .grid-cell {
-  font-size: 1rem;
-  padding: 3px 5px;
-  background-color: #1a1a1a;
-  color: #33ff33;
+  padding: 2px 5px;
+  display: inline-block;
+  color: #33ff33;  /* default color */
+}
+
+.grid-cell.word, .grid-cell.dud {
+  position: relative;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.grid-cell.highlighted {
+  background-color: #004d00; /* green background */
+  color: #fff;  /* white text color */
+  border: 1px solid #33ff33; /* green border */
   border-radius: 3px;
 }
 
