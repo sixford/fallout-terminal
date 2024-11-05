@@ -45,7 +45,7 @@
 
 /* Highlight dud removal characters to make them stand out */
 .grid-cell.dud {
-  color: #ff6347;
+  /* color: #ff6347; */
   cursor: pointer;
 }
 

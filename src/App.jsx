@@ -15,6 +15,7 @@ function App() {
   const [gameOver, setGameOver] = useState(false)
   const [wordGrid, setWordGrid] = useState([])
   const [wordPositions, setWordPositions] = useState({})
+  const [dudPositions, setDudPositions] = useState([]) // New state for dud sequence positions
 
   const dudCharacters = ['(', '?', ']', '>', ';', ')']
 
@@ -64,13 +65,17 @@ function App() {
 
     const positions = {}
     const dudRemoverSequence = '(?]>;)'
+    const dudPositionsArray = []
 
     const placeSequenceWithWrapping = (sequence, row, col) => {
+      const sequencePositions = []
       for (let i = 0; i < sequence.length; i++) {
         const wrapRow = row % gridSize
         const wrapCol = (col + i) % gridSize
         grid[wrapRow][wrapCol] = sequence[i]
+        sequencePositions.push({ row: wrapRow, col: wrapCol })
       }
+      return sequencePositions
     }
 
     randomWords.forEach((word) => {
@@ -123,7 +128,8 @@ function App() {
         }
 
         if (canPlace) {
-          placeSequenceWithWrapping(dudRemoverSequence, row, col)
+          const dudPosition = placeSequenceWithWrapping(dudRemoverSequence, row, col)
+          dudPositionsArray.push(dudPosition)
           placed = true
         }
         attemptCounter++
@@ -132,6 +138,7 @@ function App() {
 
     setWordGrid(grid)
     setWordPositions(positions)
+    setDudPositions(dudPositionsArray)
   }
 
   const handleWordClick = (word) => {
@@ -172,10 +179,20 @@ function App() {
     const updatedGrid = [...wordGrid]
 
     for (let i = 0; i < word.length; i++) {
-      const wrapRow = row % gridSize
+      const wrapRow = (row) % gridSize
       const wrapCol = (col + i) % gridSize
       updatedGrid[wrapRow][wrapCol] = isHovered ? word[i].toUpperCase() : word[i]
     }
+
+    setWordGrid(updatedGrid)
+  }
+
+  const handleDudHover = (dudPosition, isHovered) => {
+    const updatedGrid = [...wordGrid]
+
+    dudPosition.forEach(({ row, col }) => {
+      updatedGrid[row][col] = isHovered ? updatedGrid[row][col].toUpperCase() : updatedGrid[row][col].toLowerCase()
+    })
 
     setWordGrid(updatedGrid)
   }
@@ -214,9 +231,7 @@ function App() {
         {row.map((cell, colIndex) => {
           const wordAtPosition = Object.keys(wordPositions).find((word) => {
             const { row, col } = wordPositions[word]
-            return (
-              row === rowIndex && col <= colIndex && colIndex < col + word.length
-            )
+            return row === rowIndex && col <= colIndex && colIndex < col + word.length
           })
 
           if (wordAtPosition) {
@@ -231,17 +246,23 @@ function App() {
                 {cell}
               </span>
             )
-          } else if (dudCharacters.includes(cell)) {
-            return (
-              <span
-                key={colIndex}
-                className="grid-cell dud"
-                onClick={handleDudRemoval}
-              >
-                {cell}
-              </span>
-            )
           } else {
+            const dudSequence = dudPositions.find(position =>
+              position.some(p => p.row === rowIndex && p.col === colIndex)
+            )
+            if (dudSequence) {
+              return (
+                <span
+                  key={colIndex}
+                  className="grid-cell dud"
+                  onMouseEnter={() => handleDudHover(dudSequence, true)}
+                  onMouseLeave={() => handleDudHover(dudSequence, false)}
+                  onClick={handleDudRemoval}
+                >
+                  {cell}
+                </span>
+              )
+            }
             return (
               <span key={colIndex} className="grid-cell">
                 {cell}
@@ -274,3 +295,4 @@ function App() {
 }
 
 export default App
+
