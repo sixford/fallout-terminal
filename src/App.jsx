@@ -32,7 +32,7 @@ function App() {
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
 
     generateWordGrid(randomWords)
-  } 
+  }
 
   const generateRandomWords = () => {
     const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRITTY', 'POLITE', 'HOUSES', 'GRANDE', 'RANDOM']
@@ -56,12 +56,18 @@ function App() {
     )
 
     const positions = {}
+    const usedRows = new Set()
 
-    randomWords.forEach((word, index) => {
-      const row = index * 3
-      const col = Math.floor(Math.random() * (20 - word.length))
+    randomWords.forEach((word) => {
+      let row, col
+      do {
+        row = Math.floor(Math.random() * gridSize)
+      } while (usedRows.has(row) || row >= gridSize || row + word.length >= gridSize)
+      
+      usedRows.add(row)
+      col = Math.floor(Math.random() * (20 - word.length))
 
-      positions[word] = { row, col }; // Store starting position for each word
+      positions[word] = { row, col }
 
       for (let i = 0; i < word.length; i++) {
         grid[row][col + i] = word[i]
@@ -90,7 +96,7 @@ function App() {
 
       if (lives - 1 <= 0) {
         setGameOver(true)
-        setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.']);
+        setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
       } else {
         setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
       }
@@ -170,5 +176,3 @@ function App() {
 }
 
 export default App
-
-
