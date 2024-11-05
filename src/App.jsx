@@ -38,9 +38,9 @@ function App() {
     const words = [
       'PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRITTY', 'POLITE', 'HOUSES', 'GRANDE', 
       'RANDOM', 'OBJECT', 'MASTER', 'TARGET', 'REPLAY', 'STRING', 'SCALAR', 'VECTOR', 'MEMORY', 'BINARY', 'DEVICE', 
-      'MODULE', 'ACCESS', 'SYSTEM', 'LOMBOK', 'BUFFER', 'SECURE', 'INLINE', 'FORMAT'
+      'MODULE', 'ACCESS', 'SYSTEM', 'PROCESS', 'BUFFER', 'SECURE', 'INLINE', 'FORMAT'
     ]
-    const randomWords = []
+    const randomWords = [];
     while (randomWords.length < 15) {
       const word = words[Math.floor(Math.random() * words.length)]
       if (!randomWords.includes(word)) randomWords.push(word)
@@ -54,32 +54,34 @@ function App() {
   }
 
   const generateWordGrid = (randomWords) => {
-    const gridSize = 25; // Increase grid size
+    const gridSize = 25 // Increased grid size for more space
     const grid = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => getRandomCharacter())
     )
-
+  
     const positions = {}
-    let attempts = 0; // Track placement to avoid infinite loops
-
+    const maxAttempts = 50 // Limit the number of attempts to avoid infinite loops
+  
     randomWords.forEach((word) => {
       let placed = false
-
-      while (!placed && attempts < 100) {
+      let attempts = 0
+  
+      while (!placed && attempts < maxAttempts) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * (gridSize - word.length))
+  
+        // Check if the cells for this word are empty or contain only random characters
         let canPlace = true
-
-        // Check for overlap
         for (let i = 0; i < word.length; i++) {
-          if (grid[row][col + i] !== getRandomCharacter()) {
+          const cell = grid[row][col + i]
+          if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
             canPlace = false
             break
           }
         }
-
+  
         if (canPlace) {
-          positions[word] = { row, col };
+          positions[word] = { row, col }
           for (let i = 0; i < word.length; i++) {
             grid[row][col + i] = word[i]
           }
@@ -88,7 +90,7 @@ function App() {
         attempts++
       }
     })
-
+  
     setWordGrid(grid)
     setWordPositions(positions)
   }
@@ -104,13 +106,13 @@ function App() {
       setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
       setGameActive(false)
     } else {
-      const matches = calculateMatchingLetters(guess, password);
+      const matches = calculateMatchingLetters(guess, password)
       const newHint = `Hint: ${matches} letters match the correct password position.`
       setHint(newHint)
       setLives((prev) => prev - 1)
 
       if (lives - 1 <= 0) {
-        setGameOver(true);
+        setGameOver(true)
         setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
       } else {
         setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
@@ -191,4 +193,5 @@ function App() {
 }
 
 export default App
+
 
