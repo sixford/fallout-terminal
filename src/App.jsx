@@ -14,6 +14,8 @@ function App() {
   const [wordGrid, setWordGrid] = useState([])
   const [wordPositions, setWordPositions] = useState({})
 
+  const dudCharacters = ['(', '?', ']', '>', ';', ')'] // Dud character remove words
+
   const gameStart = () => {
     setGameStarted(true)
     setOutput(['Welcome to RobCo Industries TermLink'])
@@ -40,7 +42,7 @@ function App() {
       'RANDOM', 'OBJECT', 'MASTER', 'TARGET', 'REPLAY', 'STRING', 'SCALAR', 'VECTOR', 'MEMORY', 'BINARY', 'DEVICE', 
       'MODULE', 'ACCESS', 'SYSTEM', 'PROCESS', 'BUFFER', 'SECURE', 'INLINE', 'FORMAT'
     ]
-    const randomWords = [];
+    const randomWords = []
     while (randomWords.length < 15) {
       const word = words[Math.floor(Math.random() * words.length)]
       if (!randomWords.includes(word)) randomWords.push(word)
@@ -54,24 +56,24 @@ function App() {
   }
 
   const generateWordGrid = (randomWords) => {
-    const gridSize = 25 // Increased grid size for more space
+    const gridSize = 25
     const grid = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => getRandomCharacter())
     )
   
     const positions = {}
-    const maxAttempts = 50 // Limit the number of attempts to avoid infinite loops
+    let attempts = 0
   
     randomWords.forEach((word) => {
       let placed = false
-      let attempts = 0
+      let attemptCounter = 0
   
-      while (!placed && attempts < maxAttempts) {
+      while (!placed && attemptCounter < 50) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * (gridSize - word.length))
-  
-        // Check if the cells for this word are empty or contain only random characters
         let canPlace = true
+  
+        // Check if all cells in the word's position are eligible for replacement
         for (let i = 0; i < word.length; i++) {
           const cell = grid[row][col + i]
           if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
@@ -80,6 +82,7 @@ function App() {
           }
         }
   
+        // Add word to the grid and update positions
         if (canPlace) {
           positions[word] = { row, col }
           for (let i = 0; i < word.length; i++) {
@@ -87,17 +90,46 @@ function App() {
           }
           placed = true
         }
-        attempts++
+        attemptCounter++
       }
+  
+      // avoid infinite loop if words cannot be placed
+      attempts++
     })
   
     setWordGrid(grid)
     setWordPositions(positions)
   }
+  
 
   const handleWordClick = (word) => {
     if (!gameOver && gameActive) {
       checkPassword(word)
+    }
+  }
+
+  const handleDudRemoval = () => {
+    const incorrectWords = options.filter(word => word !== password && wordPositions[word])
+
+    if (incorrectWords.length > 0) {
+      const randomDud = incorrectWords[Math.floor(Math.random() * incorrectWords.length)]
+      const { row, col } = wordPositions[randomDud]
+      const updatedGrid = [...wordGrid]
+      for (let i = 0; i < randomDud.length; i++) {
+        updatedGrid[row][col + i] = getRandomCharacter()
+      }
+
+      setWordGrid(updatedGrid)
+      const updatedOptions = options.filter(word => word !== randomDud)
+      setOptions(updatedOptions)
+
+      const updatedPositions = { ...wordPositions }
+      delete updatedPositions[randomDud]
+      setWordPositions(updatedPositions)
+
+      setOutput([...output, `> Dud removed: ${randomDud}`])
+    } else {
+      setOutput([...output, '> No more duds to remove!'])
     }
   }
 
@@ -149,6 +181,16 @@ function App() {
                 {cell}
               </span>
             )
+          } else if (dudCharacters.includes(cell)) {
+            return (
+              <span
+                key={colIndex}
+                className="grid-cell dud"
+                onClick={handleDudRemoval}
+              >
+                {cell}
+              </span>
+            )
           } else {
             return (
               <span key={colIndex} className="grid-cell">
@@ -193,5 +235,3 @@ function App() {
 }
 
 export default App
-
-
