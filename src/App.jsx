@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import './App.css'
 import OpeningScreen from './OpeningScreen.jsx'
 
@@ -12,16 +12,13 @@ function App() {
   const [hint, setHint] = useState('')
   const [gameOver, setGameOver] = useState(false)
   const [wordGrid, setWordGrid] = useState([])
-  const [wordPositions, setWordPositions] = useState({})
 
-  // Game start function that also loads the game immediately
   const gameStart = () => {
     setGameStarted(true)
     setOutput(['Welcome to RobCo Industries TermLink'])
-    startGame() // Immediately start the password game and load grid
+    startGame()
   }
 
-  // Password game setup function
   const startGame = () => {
     setGameActive(true)
     setLives(3)
@@ -33,10 +30,9 @@ function App() {
     setHint(`Hint: The password has ${chosenPassword.length} letters.`)
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
 
-    generateWordGrid(randomWords) // Create grid
+    generateWordGrid(randomWords)
   }
 
-  // Generates random words
   const generateRandomWords = () => {
     const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRIPE', 'POLITE', 'HOUSES', 'GRANITE', 'RANDOM']
     let randomWords = []
@@ -47,38 +43,25 @@ function App() {
     return randomWords
   }
 
-  // Generate a random filler character
   const getRandomCharacter = () => {
     const characters = ['*', '@', '#', '$', '%', '&', '!', '^', '?']
     return characters[Math.floor(Math.random() * characters.length)]
   }
 
-  // Generate word grid with filler characters and words
-
   const generateWordGrid = (randomWords) => {
     const gridSize = 20
-    const grid = []
-    const positions = {}
-
-    for (let row = 0; row < gridSize; row++) {
-      const rowArray = []
-      for (let col = 0; col < 20; col++) {
-        rowArray.push(getRandomCharacter())
-      }
-      grid.push(rowArray)
-    }
-
-    // Randomly place words in the grid
+    const grid = Array.from({ length: gridSize }, () =>
+      Array.from({ length: 20 }, () => getRandomCharacter())
+    )
 
     randomWords.forEach((word) => {
       let placed = false
       while (!placed) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * (20 - word.length))
-        if (grid[row].slice(col, col + word.length).every((cell) => !positions[`${row}-${col}`])) {
+        if (grid[row].slice(col, col + word.length).every((cell) => !randomWords.includes(cell))) {
           for (let i = 0; i < word.length; i++) {
-            grid[row][col + i] = word[i]
-            positions[`${row}-${col + i}`] = word // Track position
+            grid[row][col + i] = word
           }
           placed = true
         }
@@ -86,14 +69,10 @@ function App() {
     })
 
     setWordGrid(grid)
-    setWordPositions(positions)
-    console.log('Generated Word Grid:', grid)
   }
 
-  // Handle clicking on a word to make a guess
   const handleWordClick = (word) => {
     if (!gameOver && gameActive) {
-      console.log("Word clicked:", word) // Debugging log
       checkPassword(word)
     }
   }
@@ -125,27 +104,24 @@ function App() {
     return matchCount
   }
 
-  // Render word grid
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
         {row.map((cell, colIndex) => {
-          const cellKey = `${rowIndex}-${colIndex}`
-          const isWord = wordPositions[cellKey] === cell
+          const isWord = options.includes(cell);
           return (
             <span
               key={colIndex}
               className={`grid-cell ${isWord ? 'word' : ''}`}
-              onClick={() => isWord && handleWordClick(wordPositions[cellKey])}
+              onClick={() => isWord && handleWordClick(cell)}
             >
-              {cell}
+              {isWord ? cell : getRandomCharacter()}
             </span>
           )
         })}
       </div>
     ))
   }
-
 
   return (
     <div className="terminal">
@@ -168,6 +144,3 @@ function App() {
 }
 
 export default App
-
-
-
