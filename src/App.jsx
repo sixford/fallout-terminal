@@ -71,7 +71,7 @@ function App() {
     const placeSequenceWithWrapping = (sequence, row, col) => {
       const sequencePositions = []
       for (let i = 0; i < sequence.length; i++) {
-        const wrapRow = row % gridSize
+        const wrapRow = row + Math.floor((col + i) / gridSize)  // Handle wrapping vertically
         const wrapCol = (col + i) % gridSize
         grid[wrapRow][wrapCol] = sequence[i]
         sequencePositions.push({ row: wrapRow, col: wrapCol })
@@ -294,6 +294,7 @@ function App() {
 }
 
 export default App
+
 
 
 
