@@ -66,11 +66,9 @@ function App() {
     // Define the exact dud remover sequence
     const dudRemoverSequence = '(?]>;)'
   
-    // Function to place a sequence with wrapping
     const placeSequenceWithWrapping = (sequence, row, col) => {
       for (let i = 0; i < sequence.length; i++) {
-        // Use modulo to wrap around the grid boundaries
-        const wrapRow = (row) % gridSize
+        const wrapRow = row % gridSize
         const wrapCol = (col + i) % gridSize
         grid[wrapRow][wrapCol] = sequence[i]
       }
@@ -87,7 +85,7 @@ function App() {
   
         let canPlace = true
         for (let i = 0; i < word.length; i++) {
-          const wrapRow = row % gridSize
+          const wrapRow = (row) % gridSize
           const wrapCol = (col + i) % gridSize
           const cell = grid[wrapRow][wrapCol]
   
@@ -106,7 +104,7 @@ function App() {
       }
     })
   
-    // Place dud remover sequence `(?>;)` randomly on the grid a few times
+    // Place the exact dud remover sequence `(?>;)` randomly on the grid a few times
     for (let i = 0; i < 3; i++) {  // Place it three times for availability
       let placed = false
       let attemptCounter = 0
@@ -137,8 +135,8 @@ function App() {
   
     setWordGrid(grid)
     setWordPositions(positions)
-  }  
-
+  }
+  
   const handleWordClick = (word) => {
     if (!gameOver && gameActive) {
       checkPassword(word)
