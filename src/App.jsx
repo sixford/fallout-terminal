@@ -54,11 +54,11 @@ function App() {
 
   // Generate word grid with filler characters and words
   const generateWordGrid = (randomWords) => {
-    const gridSize = 20; // 20 rows of grid
+    const gridSize = 20 // 20 rows of grid
     const grid = []
 
     for (let row = 0; row < gridSize; row++) {
-      const rowArray = [];
+      const rowArray = []
       for (let col = 0; col < 20; col++) {
         rowArray.push(getRandomCharacter())
       }
@@ -83,10 +83,11 @@ function App() {
     setWordGrid(grid)
   }
 
-  // Handle clicking to make a guess
+  // Handle clicking on a word to make a guess
   const handleWordClick = (word) => {
     if (!gameOver && gameActive) {
-      checkPassword(word);
+      console.log("Word clicked:", word) // Debugging log
+      checkPassword(word)
     }
   }
 
@@ -101,7 +102,7 @@ function App() {
       setLives((prev) => prev - 1)
 
       if (lives - 1 <= 0) {
-        setGameOver(true);
+        setGameOver(true)
         setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
       } else {
         setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
@@ -117,7 +118,7 @@ function App() {
     return matchCount
   }
 
-  // Render grid
+  // Render word grid
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
@@ -155,5 +156,6 @@ function App() {
 }
 
 export default App
+
 
 
