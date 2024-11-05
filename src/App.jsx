@@ -33,12 +33,13 @@ function App() {
     generateWordGrid(randomWords)
   }
 
+  // Generates a list of random six-letter words
   const generateRandomWords = () => {
-    const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRIPE', 'POLITE', 'HOUSES', 'GRANITE', 'RANDOM']
-    let randomWords = []
-    for (let i = 0; i < 6; i++) {
+    const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRANDE', 'POLITE', 'HOUSES', 'GRITTY', 'RANDOM']
+    const randomWords = []
+    while (randomWords.length < 6) {
       const word = words[Math.floor(Math.random() * words.length)]
-      randomWords.push(word)
+      if (!randomWords.includes(word)) randomWords.push(word)
     }
     return randomWords
   }
@@ -48,6 +49,7 @@ function App() {
     return characters[Math.floor(Math.random() * characters.length)]
   }
 
+  // Generate grid with words and filler characters
   const generateWordGrid = (randomWords) => {
     const gridSize = 20
     const grid = Array.from({ length: gridSize }, () =>
@@ -59,9 +61,10 @@ function App() {
       while (!placed) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * (20 - word.length))
+        
         if (grid[row].slice(col, col + word.length).every((cell) => !randomWords.includes(cell))) {
           for (let i = 0; i < word.length; i++) {
-            grid[row][col + i] = word
+            grid[row][col + i] = word[i] // Place each character of the word in the grid
           }
           placed = true
         }
@@ -71,9 +74,9 @@ function App() {
     setWordGrid(grid)
   }
 
-  const handleWordClick = (word) => {
+  const handleWordClick = (guess) => {
     if (!gameOver && gameActive) {
-      checkPassword(word)
+      checkPassword(guess)
     }
   }
 
@@ -107,18 +110,15 @@ function App() {
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
-        {row.map((cell, colIndex) => {
-          const isWord = options.includes(cell);
-          return (
-            <span
-              key={colIndex}
-              className={`grid-cell ${isWord ? 'word' : ''}`}
-              onClick={() => isWord && handleWordClick(cell)}
-            >
-              {isWord ? cell : getRandomCharacter()}
-            </span>
-          )
-        })}
+        {row.map((cell, colIndex) => (
+          <span
+            key={colIndex}
+            className="grid-cell"
+            onClick={() => options.includes(cell) && handleWordClick(cell)}
+          >
+            {cell}
+          </span>
+        ))}
       </div>
     ))
   }
@@ -144,3 +144,4 @@ function App() {
 }
 
 export default App
+
