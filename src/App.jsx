@@ -54,9 +54,9 @@ function App() {
   }
 
   const generateWordGrid = (randomWords) => {
-    const gridSize = 20
+    const gridSize = 30
     const grid = Array.from({ length: gridSize }, () =>
-      Array.from({ length: 20 }, () => getRandomCharacter())
+      Array.from({ length: 30 }, () => getRandomCharacter())
     )
 
     const positions = {}
@@ -68,7 +68,7 @@ function App() {
 
       while (!placed) {
         row = Math.floor(Math.random() * gridSize)
-        col = Math.floor(Math.random() * (20 - word.length))
+        col = Math.floor(Math.random() * (30 - word.length))
 
         // Check for overlap with existing words
         if (!usedRows.has(`${row}-${col}`)) {
