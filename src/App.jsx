@@ -4,7 +4,6 @@ import OpeningScreen from './OpeningScreen.jsx'
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false)
-  const [input, setInput] = useState('')
   const [output, setOutput] = useState(['Welcome to RobCo Industries Termlink'])
   const [gameActive, setGameActive] = useState(false)
   const [options, setOptions] = useState([])
@@ -14,11 +13,11 @@ function App() {
   const [gameOver, setGameOver] = useState(false)
   const [wordGrid, setWordGrid] = useState([])
 
-  // Game start function 
+  // Game start function that also loads the game immediately
   const gameStart = () => {
     setGameStarted(true)
     setOutput(['Welcome to RobCo Industries TermLink'])
-    startGame()
+    startGame() // Immediately start the password game and load grid
   }
 
   // Password game setup function
@@ -33,7 +32,7 @@ function App() {
     setHint(`Hint: The password has ${chosenPassword.length} letters.`)
     setOutput([...output, 'Password Hack Initiated. You have 3 tries'])
 
-    generateWordGrid(randomWords) // Create grid
+    generateWordGrid(randomWords); // Create grid
   }
 
   // Generates random words
@@ -55,11 +54,11 @@ function App() {
 
   // Generate word grid with filler characters and words
   const generateWordGrid = (randomWords) => {
-    const gridSize = 20 // 20 rows of grid
+    const gridSize = 20; // 20 rows of grid
     const grid = []
 
     for (let row = 0; row < gridSize; row++) {
-      const rowArray = []
+      const rowArray = [];
       for (let col = 0; col < 20; col++) {
         rowArray.push(getRandomCharacter())
       }
@@ -72,7 +71,7 @@ function App() {
       while (!placed) {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * (20 - word.length))
-        if (grid[row].slice(col, col + word.length).every((cell) => !randomWords.includes(cell))) {
+        if (grid[row].slice(col, col + word.length).every((cell) => cell !== word)) {
           for (let i = 0; i < word.length; i++) {
             grid[row][col + i] = word[i]
           }
@@ -84,33 +83,10 @@ function App() {
     setWordGrid(grid)
   }
 
-  const processCommand = (command) => {
-    let response = 'Unknown command'
-    if (command === 'help') {
-      response = 'Available commands: help, about, hack'
-    } else if (command === 'about') {
-      response = 'RobCo Industries (TM) Terminal'
-    } else if (command === 'hack') {
-      startGame()
-      response = 'Password Hack Initiated. Type your guess.'
-    }
-    setOutput([...output, `> ${command}`, response])
-  } // Close processCommand function
-
-  const handleInput = (event) => {
-    if (event.key === 'Enter') {
-      if (gameOver) {
-        setOutput([...output, 'Terminal Locked. Game Over.'])
-        setInput('')
-        return
-      }
-
-      if (gameActive) {
-        checkPassword(input)
-      } else {
-        processCommand(input)
-      }
-      setInput('')
+  // Handle clicking to make a guess
+  const handleWordClick = (word) => {
+    if (!gameOver && gameActive) {
+      checkPassword(word);
     }
   }
 
@@ -119,7 +95,7 @@ function App() {
       setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
       setGameActive(false)
     } else {
-      const matches = calculateMatchingLetters(guess, password);
+      const matches = calculateMatchingLetters(guess, password)
       const newHint = `Hint: ${matches} letters match the correct password position.`
       setHint(newHint)
       setLives((prev) => prev - 1)
@@ -141,12 +117,18 @@ function App() {
     return matchCount
   }
 
-  // Render the word grid
+  // Render grid
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
         {row.map((cell, colIndex) => (
-          <span key={colIndex} className="grid-cell">{cell}</span>
+          <span
+            key={colIndex}
+            className={`grid-cell ${options.includes(cell) ? 'word' : ''}`}
+            onClick={() => options.includes(cell) && handleWordClick(cell)}
+          >
+            {cell}
+          </span>
         ))}
       </div>
     ))
@@ -166,15 +148,6 @@ function App() {
           )}
           <div className="lives">Lives: {lives}</div>
           <div className="hint">{hint}</div>
-          <input
-            type="text"
-            className="input"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleInput}
-            placeholder="Enter command or password"
-            disabled={gameOver}
-          />
         </>
       )}
     </div>
@@ -182,4 +155,5 @@ function App() {
 }
 
 export default App
+
 
