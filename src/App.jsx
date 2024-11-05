@@ -15,7 +15,8 @@ function App() {
   const [gameOver, setGameOver] = useState(false)
   const [wordGrid, setWordGrid] = useState([])
   const [wordPositions, setWordPositions] = useState({})
-  const [dudPositions, setDudPositions] = useState([]) // New state for dud sequence positions
+  const [dudPositions, setDudPositions] = useState([]) // State for dud sequence positions
+  const [highlightedCells, setHighlightedCells] = useState([]) // New state for highlighted cells
 
   const dudCharacters = ['(', '?', ']', '>', ';', ')']
 
@@ -147,54 +148,21 @@ function App() {
     }
   }
 
-  const checkPassword = (guess) => {
-    if (guess === password) {
-      setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
-      setGameActive(false)
-    } else {
-      const matches = calculateMatchingLetters(guess, password)
-      const newHint = `Hint: ${matches} letters match the correct password position.`
-      setHint(newHint)
-      setLives((prev) => prev - 1)
-
-      if (lives - 1 <= 0) {
-        setGameOver(true)
-        setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
-      } else {
-        setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
-      }
-    }
-  }
-
-  const calculateMatchingLetters = (guess, password) => {
-    let matchCount = 0
-    for (let i = 0; i < guess.length; i++) {
-      if (guess[i] === password[i]) matchCount++
-    }
-    return matchCount
-  }
-
   const handleWordHover = (word, isHovered) => {
     const { row, col } = wordPositions[word]
-    const updatedGrid = [...wordGrid]
+    const cellsToHighlight = []
 
     for (let i = 0; i < word.length; i++) {
       const wrapRow = (row) % gridSize
       const wrapCol = (col + i) % gridSize
-      updatedGrid[wrapRow][wrapCol] = isHovered ? word[i].toUpperCase() : word[i]
+      cellsToHighlight.push({ row: wrapRow, col: wrapCol })
     }
 
-    setWordGrid(updatedGrid)
+    setHighlightedCells(isHovered ? cellsToHighlight : [])
   }
 
   const handleDudHover = (dudPosition, isHovered) => {
-    const updatedGrid = [...wordGrid]
-
-    dudPosition.forEach(({ row, col }) => {
-      updatedGrid[row][col] = isHovered ? updatedGrid[row][col].toUpperCase() : updatedGrid[row][col].toLowerCase()
-    })
-
-    setWordGrid(updatedGrid)
+    setHighlightedCells(isHovered ? dudPosition : [])
   }
 
   const handleDudRemoval = () => {
@@ -225,6 +193,33 @@ function App() {
     }
   }
 
+  const checkPassword = (guess) => {
+    if (guess === password) {
+      setOutput([...output, `> ${guess}`, 'Access Granted. Welcome, user.'])
+      setGameActive(false)
+    } else {
+      const matches = calculateMatchingLetters(guess, password)
+      const newHint = `Hint: ${matches} letters match the correct password position.`
+      setHint(newHint)
+      setLives((prev) => prev - 1)
+
+      if (lives - 1 <= 0) {
+        setGameOver(true)
+        setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
+      } else {
+        setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
+      }
+    }
+  }
+
+  const calculateMatchingLetters = (guess, password) => {
+    let matchCount = 0
+    for (let i = 0; i < guess.length; i++) {
+      if (guess[i] === password[i]) matchCount++
+    }
+    return matchCount
+  }
+
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
@@ -234,11 +229,15 @@ function App() {
             return row === rowIndex && col <= colIndex && colIndex < col + word.length
           })
 
+          const isHighlighted = highlightedCells.some(
+            (cell) => cell.row === rowIndex && cell.col === colIndex
+          )
+
           if (wordAtPosition) {
             return (
               <span
                 key={colIndex}
-                className="grid-cell word"
+                className={`grid-cell word ${isHighlighted ? 'highlighted' : ''}`}
                 onClick={() => handleWordClick(wordAtPosition)}
                 onMouseEnter={() => handleWordHover(wordAtPosition, true)}
                 onMouseLeave={() => handleWordHover(wordAtPosition, false)}
@@ -254,7 +253,7 @@ function App() {
               return (
                 <span
                   key={colIndex}
-                  className="grid-cell dud"
+                  className={`grid-cell dud ${isHighlighted ? 'highlighted' : ''}`}
                   onMouseEnter={() => handleDudHover(dudSequence, true)}
                   onMouseLeave={() => handleDudHover(dudSequence, false)}
                   onClick={handleDudRemoval}
@@ -295,4 +294,6 @@ function App() {
 }
 
 export default App
+
+
 
