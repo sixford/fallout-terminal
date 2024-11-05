@@ -64,17 +64,23 @@ function App() {
 
     randomWords.forEach((word) => {
       let row, col
-      do {
+      let placed = false
+
+      while (!placed) {
         row = Math.floor(Math.random() * gridSize)
-      } while (usedRows.has(row) || row >= gridSize || row + word.length >= gridSize)
-      
-      usedRows.add(row)
-      col = Math.floor(Math.random() * (20 - word.length))
+        col = Math.floor(Math.random() * (20 - word.length))
 
-      positions[word] = { row, col }
+        // Check for overlap with existing words
+        if (!usedRows.has(`${row}-${col}`)) {
+          positions[word] = { row, col }
+          usedRows.add(`${row}-${col}-${word.length}`)
 
-      for (let i = 0; i < word.length; i++) {
-        grid[row][col + i] = word[i]
+          // Place each letter of the word in the grid
+          for (let i = 0; i < word.length; i++) {
+            grid[row][col + i] = word[i]
+          }
+          placed = true
+        }
       }
     })
 
