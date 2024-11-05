@@ -64,8 +64,8 @@ function App() {
     const positions = {}
     let attempts = 0
   
-    // Define dud removal sequences to place in the grid
-    const dudSequences = ['(?)', '];', '>;', '[?', '(]', '>&']
+    // Define the exact dud remover sequence
+    const dudRemoverSequence = '(?]>;)'
   
     randomWords.forEach((word) => {
       let placed = false
@@ -76,7 +76,6 @@ function App() {
         const col = Math.floor(Math.random() * (gridSize - word.length))
         let canPlace = true
   
-        // Check if all cells in the word's position are eligible for replacement
         for (let i = 0; i < word.length; i++) {
           const cell = grid[row][col + i]
           if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
@@ -85,7 +84,6 @@ function App() {
           }
         }
   
-        // If placeable, add word to the grid and update positions
         if (canPlace) {
           positions[word] = { row, col }
           for (let i = 0; i < word.length; i++) {
@@ -99,19 +97,18 @@ function App() {
       attempts++
     })
   
-    // Dud removal sequences in the grid
-    dudSequences.forEach((sequence) => {
+    // Place dud remover sequence `(?>;)` randomly on the grid a few times
+    for (let i = 0; i < 3; i++) {  // Three times for availability
       let placed = false
       let attemptCounter = 0
   
       while (!placed && attemptCounter < 50) {
         const row = Math.floor(Math.random() * gridSize)
-        const col = Math.floor(Math.random() * (gridSize - sequence.length))
+        const col = Math.floor(Math.random() * (gridSize - dudRemoverSequence.length))
         let canPlace = true
   
-        // Check if the sequence can fit in this location
-        for (let i = 0; i < sequence.length; i++) {
-          const cell = grid[row][col + i]
+        for (let j = 0; j < dudRemoverSequence.length; j++) {
+          const cell = grid[row][col + j]
           if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
             canPlace = false
             break
@@ -119,21 +116,18 @@ function App() {
         }
   
         if (canPlace) {
-          for (let i = 0; i < sequence.length; i++) {
-            grid[row][col + i] = sequence[i]
+          for (let j = 0; j < dudRemoverSequence.length; j++) {
+            grid[row][col + j] = dudRemoverSequence[j]
           }
           placed = true
         }
         attemptCounter++
       }
-    })
+    }
   
     setWordGrid(grid)
     setWordPositions(positions)
   }
-  
-  
-  
 
   const handleWordClick = (word) => {
     if (!gameOver && gameActive) {

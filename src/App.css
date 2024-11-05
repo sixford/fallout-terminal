@@ -32,7 +32,6 @@
 }
 
 .grid-cell.dud {
-  color: #FF6347; /* Different color to stand out */
   cursor: pointer;
 }
 
