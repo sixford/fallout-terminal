@@ -17,12 +17,16 @@
   padding: 0 2px;
 }
 
-.grid-cell:hover {
-  color: #00FF00;
-  border: 1px solid #00FF00;
+.grid-cell.word {
+  cursor: pointer;
+  font-weight: bold;
+  color: #33FF33;
+  padding: 2px;
+  border-radius: 3px;
 }
 
-
-
-
-
+.grid-cell.word:hover {
+  color: #00FF00;
+  border: 1px solid #00FF00;
+  background-color: rgba(0, 255, 0, 0.1);
+}

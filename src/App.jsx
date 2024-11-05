@@ -56,18 +56,11 @@ function App() {
       Array.from({ length: 20 }, () => getRandomCharacter())
     )
 
-    randomWords.forEach((word) => {
-      let placed = false
-      while (!placed) {
-        const row = Math.floor(Math.random() * gridSize)
-        const col = Math.floor(Math.random() * (20 - word.length))
-        
-        if (grid[row].slice(col, col + word.length).every((cell) => !randomWords.includes(cell))) {
-          for (let i = 0; i < word.length; i++) {
-            grid[row][col + i] = word[i] // Place each character of the word in the grid
-          }
-          placed = true
-        }
+    randomWords.forEach((word, index) => {
+      const row = index * 3; // Leave a few rows in between words
+      const col = Math.floor(Math.random() * (20 - word.length));
+      for (let i = 0; i < word.length; i++) {
+        grid[row][col + i] = word[i];
       }
     })
 
@@ -113,7 +106,7 @@ function App() {
         {row.map((cell, colIndex) => (
           <span
             key={colIndex}
-            className="grid-cell"
+            className={`grid-cell ${options.includes(cell) ? 'word' : ''}`}
             onClick={() => options.includes(cell) && handleWordClick(cell)}
           >
             {cell}
