@@ -60,6 +60,7 @@ function App() {
   }
 
   const generateWordGrid = (randomWords) => {
+    // Initialize grid with random characters
     const grid = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => getRandomCharacter())
     )
@@ -71,7 +72,7 @@ function App() {
     const placeSequenceWithWrapping = (sequence, row, col) => {
       const sequencePositions = []
       for (let i = 0; i < sequence.length; i++) {
-        const wrapRow = row + Math.floor((col + i) / gridSize)  // Handle wrapping vertically
+        const wrapRow = (row + Math.floor((col + i) / gridSize)) % gridSize  // Wrap vertically within grid
         const wrapCol = (col + i) % gridSize
         grid[wrapRow][wrapCol] = sequence[i]
         sequencePositions.push({ row: wrapRow, col: wrapCol })
@@ -87,22 +88,24 @@ function App() {
         const row = Math.floor(Math.random() * gridSize)
         const col = Math.floor(Math.random() * gridSize)
 
+        // Check if the word can be placed without overlapping non-empty cells
         let canPlace = true
         for (let i = 0; i < word.length; i++) {
-          const wrapRow = row % gridSize
+          const wrapRow = (row + Math.floor((col + i) / gridSize)) % gridSize
           const wrapCol = (col + i) % gridSize
-          const cell = grid[wrapRow][wrapCol]
-
-          if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
+          if (!['*', '@', '#', '$', '%', '&', '!', '^', '?'].includes(grid[wrapRow][wrapCol])) {
             canPlace = false
             break
           }
         }
 
         if (canPlace) {
+          console.log(`Placing word: ${word} at row: ${row}, col: ${col}`)
           positions[word] = { row, col }
           placeSequenceWithWrapping(word, row, col)
           placed = true
+        } else {
+          console.log(`Failed to place word: ${word} at attempt ${attemptCounter}`)
         }
         attemptCounter++
       }
@@ -118,11 +121,9 @@ function App() {
 
         let canPlace = true
         for (let j = 0; j < dudRemoverSequence.length; j++) {
-          const wrapRow = row % gridSize
+          const wrapRow = (row + Math.floor((col + j) / gridSize)) % gridSize
           const wrapCol = (col + j) % gridSize
-          const cell = grid[wrapRow][wrapCol]
-
-          if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
+          if (!['*', '@', '#', '$', '%', '&', '!', '^', '?'].includes(grid[wrapRow][wrapCol])) {
             canPlace = false
             break
           }
@@ -132,11 +133,14 @@ function App() {
           const dudPosition = placeSequenceWithWrapping(dudRemoverSequence, row, col)
           dudPositionsArray.push(dudPosition)
           placed = true
+        } else {
+          console.log(`Failed to place dud remover at attempt ${attemptCounter}`)
         }
         attemptCounter++
       }
     }
 
+    console.log("Final word positions:", positions)
     setWordGrid(grid)
     setWordPositions(positions)
     setDudPositions(dudPositionsArray)
@@ -153,7 +157,7 @@ function App() {
     const cellsToHighlight = []
 
     for (let i = 0; i < word.length; i++) {
-      const wrapRow = (row) % gridSize
+      const wrapRow = (row + Math.floor((col + i) / gridSize)) % gridSize
       const wrapCol = (col + i) % gridSize
       cellsToHighlight.push({ row: wrapRow, col: wrapCol })
     }
@@ -175,7 +179,7 @@ function App() {
       const updatedGrid = [...wordGrid]
       
       for (let i = 0; i < randomDud.length; i++) {
-        const wrapRow = (row + i) % gridSize
+        const wrapRow = (row + Math.floor((col + i) / gridSize)) % gridSize
         const wrapCol = (col + i) % gridSize
         updatedGrid[wrapRow][wrapCol] = getRandomCharacter()
       }
@@ -226,7 +230,12 @@ function App() {
         {row.map((cell, colIndex) => {
           const wordAtPosition = Object.keys(wordPositions).find((word) => {
             const { row, col } = wordPositions[word]
-            return row === rowIndex && col <= colIndex && colIndex < col + word.length
+            const wordLength = word.length
+            const wordCells = Array.from({ length: wordLength }, (_, i) => ({
+              row: (row + Math.floor((col + i) / gridSize)) % gridSize,
+              col: (col + i) % gridSize
+            }))
+            return wordCells.some(pos => pos.row === rowIndex && pos.col === colIndex)
           })
 
           const isHighlighted = highlightedCells.some(
@@ -294,7 +303,3 @@ function App() {
 }
 
 export default App
-
-
-
-
