@@ -62,22 +62,35 @@ function App() {
     )
   
     const positions = {}
-    let attempts = 0
   
     // Define the exact dud remover sequence
     const dudRemoverSequence = '(?]>;)'
   
+    // Function to place a sequence with wrapping
+    const placeSequenceWithWrapping = (sequence, row, col) => {
+      for (let i = 0; i < sequence.length; i++) {
+        // Use modulo to wrap around the grid boundaries
+        const wrapRow = (row) % gridSize
+        const wrapCol = (col + i) % gridSize
+        grid[wrapRow][wrapCol] = sequence[i]
+      }
+    }
+  
+    // Place each word in a random location with wrapping
     randomWords.forEach((word) => {
       let placed = false
       let attemptCounter = 0
   
       while (!placed && attemptCounter < 50) {
         const row = Math.floor(Math.random() * gridSize)
-        const col = Math.floor(Math.random() * (gridSize - word.length))
-        let canPlace = true
+        const col = Math.floor(Math.random() * gridSize)
   
+        let canPlace = true
         for (let i = 0; i < word.length; i++) {
-          const cell = grid[row][col + i]
+          const wrapRow = row % gridSize
+          const wrapCol = (col + i) % gridSize
+          const cell = grid[wrapRow][wrapCol]
+  
           if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
             canPlace = false
             break
@@ -86,29 +99,28 @@ function App() {
   
         if (canPlace) {
           positions[word] = { row, col }
-          for (let i = 0; i < word.length; i++) {
-            grid[row][col + i] = word[i]
-          }
+          placeSequenceWithWrapping(word, row, col)
           placed = true
         }
         attemptCounter++
       }
-  
-      attempts++
     })
   
     // Place dud remover sequence `(?>;)` randomly on the grid a few times
-    for (let i = 0; i < 3; i++) {  // Three times for availability
+    for (let i = 0; i < 3; i++) {  // Place it three times for availability
       let placed = false
       let attemptCounter = 0
   
       while (!placed && attemptCounter < 50) {
         const row = Math.floor(Math.random() * gridSize)
-        const col = Math.floor(Math.random() * (gridSize - dudRemoverSequence.length))
-        let canPlace = true
+        const col = Math.floor(Math.random() * gridSize)
   
+        let canPlace = true
         for (let j = 0; j < dudRemoverSequence.length; j++) {
-          const cell = grid[row][col + j]
+          const wrapRow = row % gridSize
+          const wrapCol = (col + j) % gridSize
+          const cell = grid[wrapRow][wrapCol]
+  
           if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
             canPlace = false
             break
@@ -116,9 +128,7 @@ function App() {
         }
   
         if (canPlace) {
-          for (let j = 0; j < dudRemoverSequence.length; j++) {
-            grid[row][col + j] = dudRemoverSequence[j]
-          }
+          placeSequenceWithWrapping(dudRemoverSequence, row, col)
           placed = true
         }
         attemptCounter++
@@ -127,7 +137,7 @@ function App() {
   
     setWordGrid(grid)
     setWordPositions(positions)
-  }
+  }  
 
   const handleWordClick = (word) => {
     if (!gameOver && gameActive) {
