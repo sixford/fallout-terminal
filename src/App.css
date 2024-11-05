@@ -30,3 +30,12 @@
   border: 1px solid #00FF00;
   background-color: rgba(0, 255, 0, 0.1);
 }
+
+.grid-cell.dud {
+  color: #FF6347; /* Different color to stand out */
+  cursor: pointer;
+}
+
+.grid-cell.dud:hover {
+  background-color: rgba(255, 99, 71, 0.3); /* Hover effect */
+}

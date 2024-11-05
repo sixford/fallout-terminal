@@ -64,6 +64,9 @@ function App() {
     const positions = {}
     let attempts = 0
   
+    // Define dud removal sequences to place in the grid
+    const dudSequences = ['(?)', '];', '>;', '[?', '(]', '>&']
+  
     randomWords.forEach((word) => {
       let placed = false
       let attemptCounter = 0
@@ -82,7 +85,7 @@ function App() {
           }
         }
   
-        // Add word to the grid and update positions
+        // If placeable, add word to the grid and update positions
         if (canPlace) {
           positions[word] = { row, col }
           for (let i = 0; i < word.length; i++) {
@@ -93,13 +96,43 @@ function App() {
         attemptCounter++
       }
   
-      // avoid infinite loop if words cannot be placed
       attempts++
+    })
+  
+    // Dud removal sequences in the grid
+    dudSequences.forEach((sequence) => {
+      let placed = false
+      let attemptCounter = 0
+  
+      while (!placed && attemptCounter < 50) {
+        const row = Math.floor(Math.random() * gridSize)
+        const col = Math.floor(Math.random() * (gridSize - sequence.length))
+        let canPlace = true
+  
+        // Check if the sequence can fit in this location
+        for (let i = 0; i < sequence.length; i++) {
+          const cell = grid[row][col + i]
+          if (cell !== '*' && cell !== '@' && cell !== '#' && cell !== '$' && cell !== '%' && cell !== '&' && cell !== '!' && cell !== '^' && cell !== '?') {
+            canPlace = false
+            break
+          }
+        }
+  
+        if (canPlace) {
+          for (let i = 0; i < sequence.length; i++) {
+            grid[row][col + i] = sequence[i]
+          }
+          placed = true
+        }
+        attemptCounter++
+      }
     })
   
     setWordGrid(grid)
     setWordPositions(positions)
   }
+  
+  
   
 
   const handleWordClick = (word) => {
