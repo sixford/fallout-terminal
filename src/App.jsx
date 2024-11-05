@@ -35,9 +35,13 @@ function App() {
   }
 
   const generateRandomWords = () => {
-    const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRITTY', 'POLITE', 'HOUSES', 'GRANDE', 'RANDOM']
+    const words = [
+      'PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRITTY', 'POLITE', 'HOUSES', 'GRANDE', 
+      'RANDOM', 'OBJECT', 'MASTER', 'TARGET', 'REPLAY', 'STRING', 'SCALAR', 'VECTOR', 'MEMORY', 'BINARY', 'DEVICE', 
+      'MODULE', 'ACCESS', 'SYSTEM', 'PROCESS', 'BUFFER', 'SECURE', 'INLINE', 'FORMAT'
+    ]
     const randomWords = []
-    while (randomWords.length < 6) {
+    while (randomWords.length < 15) {
       const word = words[Math.floor(Math.random() * words.length)]
       if (!randomWords.includes(word)) randomWords.push(word)
     }
