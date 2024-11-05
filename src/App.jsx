@@ -126,18 +126,23 @@ function App() {
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
-        {row.map((cell, colIndex) => (
-          <span
-            key={colIndex}
-            className={`grid-cell ${options.includes(cell) ? 'word' : ''}`}
-            onClick={() => options.includes(cell) && handleWordClick(cell)}
-          >
-            {cell}
-          </span>
-        ))}
+        {row.map((cell, colIndex) => {
+          const cellKey = `${rowIndex}-${colIndex}`
+          const isWord = wordPositions[cellKey] === cell
+          return (
+            <span
+              key={colIndex}
+              className={`grid-cell ${isWord ? 'word' : ''}`}
+              onClick={() => isWord && handleWordClick(wordPositions[cellKey])}
+            >
+              {cell}
+            </span>
+          )
+        })}
       </div>
     ))
   }
+
 
   return (
     <div className="terminal">
