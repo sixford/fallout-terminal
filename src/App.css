@@ -1,40 +1,72 @@
-.word-grid {
-  font-family: monospace;
-  color: #33FF33;
+/* Main container that centers content */
+.terminal {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1e1e1e;
+  color: #33ff33;
+  font-family: 'Courier New', Courier, monospace;
 }
 
+/* Output section styling */
+.output {
+  text-align: center;
+  margin-bottom: 1rem;
+  max-width: 80%;
+}
+
+/* Center the word grid and add some padding for clarity */
+.word-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  background-color: #000;
+  border: 2px solid #33ff33;
+}
+
+/* Each row in the word grid */
 .grid-row {
   display: flex;
-  line-height: 1.5;
+  justify-content: center;
+  gap: 3px;
 }
 
+/* Each cell in the grid */
 .grid-cell {
-  width: 1ch;
-  text-align: center;
-  cursor: default;
-  padding: 0 2px;
-}
-
-.grid-cell.word {
-  cursor: pointer;
-  font-weight: bold;
-  color: #33FF33;
-  padding: 2px;
+  font-size: 1rem;
+  padding: 3px 5px;
+  background-color: #1a1a1a;
+  color: #33ff33;
   border-radius: 3px;
 }
 
-.grid-cell.word:hover {
-  color: #00FF00;
-  border: 1px solid #00FF00;
-  background-color: rgba(0, 255, 0, 0.1);
-}
-
+/* Highlight dud removal characters to make them stand out */
 .grid-cell.dud {
+  color: #ff6347;
   cursor: pointer;
 }
 
-.grid-cell.dud:hover {
-  background-color: rgba(255, 99, 71, 0.3); /* Hover effect */
+/* Highlight hovered cells for better interaction */
+.grid-cell:hover {
+  background-color: #333;
 }
+
+/* Styling for the lives and hint sections */
+.lives, .hint {
+  margin: 10px;
+  font-size: 1.2rem;
+  color: #33ff33;
+}
+
+/* Styling for the start screen */
+.opening-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
