@@ -12,6 +12,7 @@ function App() {
   const [hint, setHint] = useState('')
   const [gameOver, setGameOver] = useState(false)
   const [wordGrid, setWordGrid] = useState([])
+  const [wordPositions, setWordPositions] = useState({})
 
   const gameStart = () => {
     setGameStarted(true)
@@ -33,9 +34,8 @@ function App() {
     generateWordGrid(randomWords)
   }
 
-  // Generates a list of random six-letter words
   const generateRandomWords = () => {
-    const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRANDE', 'POLITE', 'HOUSES', 'GRITTY', 'RANDOM']
+    const words = ['PARISH', 'CREATE', 'SPACES', 'BOLTON', 'MODALS', 'THINGS', 'PALLET', 'GRITTY', 'POLITE', 'HOUSES', 'GRANDE', 'RANDOM']
     const randomWords = []
     while (randomWords.length < 6) {
       const word = words[Math.floor(Math.random() * words.length)]
@@ -49,27 +49,32 @@ function App() {
     return characters[Math.floor(Math.random() * characters.length)]
   }
 
-  // Generate grid with words and filler characters
   const generateWordGrid = (randomWords) => {
     const gridSize = 20
     const grid = Array.from({ length: gridSize }, () =>
       Array.from({ length: 20 }, () => getRandomCharacter())
     )
 
+    const positions = {}
+
     randomWords.forEach((word, index) => {
-      const row = index * 3; // Leave a few rows in between words
-      const col = Math.floor(Math.random() * (20 - word.length));
+      const row = index * 3
+      const col = Math.floor(Math.random() * (20 - word.length))
+
+      positions[word] = { row, col }; // Store starting position for each word
+
       for (let i = 0; i < word.length; i++) {
-        grid[row][col + i] = word[i];
+        grid[row][col + i] = word[i]
       }
     })
 
     setWordGrid(grid)
+    setWordPositions(positions)
   }
 
-  const handleWordClick = (guess) => {
+  const handleWordClick = (word) => {
     if (!gameOver && gameActive) {
-      checkPassword(guess)
+      checkPassword(word)
     }
   }
 
@@ -85,7 +90,7 @@ function App() {
 
       if (lives - 1 <= 0) {
         setGameOver(true)
-        setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.'])
+        setOutput([...output, `> ${guess}`, 'Incorrect. Terminal Locked.']);
       } else {
         setOutput([...output, `> ${guess}`, `Incorrect password. ${newHint} You have ${lives - 1} attempts remaining.`])
       }
@@ -103,17 +108,45 @@ function App() {
   const renderWordGrid = () => {
     return wordGrid.map((row, rowIndex) => (
       <div key={rowIndex} className="grid-row">
-        {row.map((cell, colIndex) => (
-          <span
-            key={colIndex}
-            className={`grid-cell ${options.includes(cell) ? 'word' : ''}`}
-            onClick={() => options.includes(cell) && handleWordClick(cell)}
-          >
-            {cell}
-          </span>
-        ))}
+        {row.map((cell, colIndex) => {
+          const wordAtPosition = Object.keys(wordPositions).find((word) => {
+            const { row, col } = wordPositions[word]
+            return row === rowIndex && col <= colIndex && colIndex < col + word.length
+          })
+
+          if (wordAtPosition) {
+            return (
+              <span
+                key={colIndex}
+                className="grid-cell word"
+                onClick={() => handleWordClick(wordAtPosition)}
+                onMouseEnter={() => handleWordHover(wordAtPosition, true)}
+                onMouseLeave={() => handleWordHover(wordAtPosition, false)}
+              >
+                {cell}
+              </span>
+            )
+          } else {
+            return (
+              <span key={colIndex} className="grid-cell">
+                {cell}
+              </span>
+            )
+          }
+        })}
       </div>
     ))
+  }
+
+  const handleWordHover = (word, isHovered) => {
+    const { row, col } = wordPositions[word]
+    const updatedGrid = [...wordGrid]
+
+    for (let i = 0; i < word.length; i++) {
+      updatedGrid[row][col + i] = isHovered ? word[i].toUpperCase() : word[i]
+    }
+
+    setWordGrid(updatedGrid)
   }
 
   return (
@@ -137,4 +170,5 @@ function App() {
 }
 
 export default App
+
 
