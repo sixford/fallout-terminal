@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import './App.css'
 import OpeningScreen from './OpeningScreen.jsx'
 
-const gridSize = 25  // Define gridSize at the top level so it's accessible throughout
+const gridSize = 25
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false)
