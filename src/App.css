@@ -6,9 +6,9 @@
   align-items: center;
   min-height: 100vh;
   background-color: #1e1e1e;
-  font-family: 'VT323', monospace;
-  font-size: 1.2em;
-  color: #00FF00;
+  font-family: 'Courier New', Courier, Monaco, monospace;
+  font-size: 1.2em; /* Adjust font size for desired look */
+  color: #00FF00; /* Classic green terminal color */
 }
 
 /* Output section styling */
